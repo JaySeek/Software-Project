@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Eye Safer</string>
+
+    <!-- MainActivity -->
+    <string name="connecting">연결중...</string>
+    <string name="not_connected">연결된 장치가 없음</string>
+    <string name="connected_device_name">연결됨 : </string>
+
+    <!-- DeviceListActivity -->
+    <string name="paired_devices">페어링된 장치</string>
+    <string name="other_devices">검색된 다른 장치</string>
+    <string name="button_scan">장치 검색</string>
+
+    <!-- Menu -->
+    <string name="menu_device_search">디바이스 검색</string>
+    <string name="menu1">메뉴1</string>
+    <string name="menu2">메뉴2</string>
+</resources>
