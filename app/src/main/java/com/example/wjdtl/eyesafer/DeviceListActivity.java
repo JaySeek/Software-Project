@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -102,7 +103,7 @@ public class DeviceListActivity extends Activity {
 
     private void doDiscovery() {
 
-        setTitle("scanning");
+        setTitle("블루투스 장치 검색 중");
         findViewById(R.id.title_new_devices).setVisibility(View.VISIBLE);
 
         // 블루투스 장치 이미 검색중이라면 취소 후 검색 시작
@@ -143,14 +144,15 @@ public class DeviceListActivity extends Activity {
 
                 // 찾은 디바이스가 페어링이 되어 있지 않다면
                 if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
-                    mNewDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+                        if (mNewDevicesArrayAdapter.getPosition(device.getName() + "\n" + device.getAddress()) == -1)
+                            mNewDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+                    }
                 }
-            }
             // 디바이스 찾기가 끝나면 타이틀 변경
             else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 setTitle("연결할 디바이스를 선택하시오");
                 if (mNewDevicesArrayAdapter.getCount() == 0) {
-                    String noDevices = "찾은 디바이스 없음";
+                    String noDevices = "검색된 디바이스 없음";
                     mNewDevicesArrayAdapter.add(noDevices);
                 }
             }
