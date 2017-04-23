@@ -42,7 +42,6 @@ public class MainActivity extends Activity {
         if (mBluetoothAdapter == null) { // 기기에 Bluetooth 장치가 없을 경우
             Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
             finish();
-            return;
         }
     }
 
@@ -84,13 +83,17 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch(requestCode) {
             case REQUEST_CONNECT_DEVICE : // 블루투스 Connect 목적의 Intent 요청일 경우
+                if(resultCode != 0)
                 connectDevice(data);
                 break;
             case REQUEST_ENABLE_BT: // 블루투스를 Enable 시키기 위한 요청 코드일 경우
                 if(resultCode == Activity.RESULT_OK) {
-                    // 켜져있다면 채팅 세션 바로 오픈
+                    // 켠다면
+                    Log.d(TAG, "BT not enabled");
+                    Toast.makeText(this,"블루투스 ON",Toast.LENGTH_SHORT).show();
+                    finish();
                 }
-                else { // 꺼져 있다면
+                else { // 켜지 않는다면
                     Log.d(TAG, "BT not enabled");
                     Toast.makeText(this,"블루투스 OFF 상태, \n앱을 종료합니다.",Toast.LENGTH_SHORT).show();
                     finish();
@@ -100,25 +103,13 @@ public class MainActivity extends Activity {
 
     // ActionBar 상태 변환(제목명)
     private void setStatus(CharSequence subTitle) {
-        if (null == this) {
-            return;
-        }
         final ActionBar actionBar = this.getActionBar();
-        if (null == actionBar) {
-            return;
-        }
         actionBar.setSubtitle(subTitle);
     }
 
     // ActionBar 상태 변환(리소스 ID)
     private void setStatus(int resId) {
-        if (null == this) {
-            return;
-        }
         final ActionBar actionBar = this.getActionBar();
-        if (null == actionBar) {
-            return;
-        }
         actionBar.setSubtitle(resId);
     }
 
@@ -151,16 +142,12 @@ public class MainActivity extends Activity {
                 case Constants.MESSAGE_DEVICE_NAME:
                     // 장치명 저장
                     mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
-                    if (null != this) {
-                        Toast.makeText(MainActivity.this, "연결 성공 : "
+                    Toast.makeText(MainActivity.this, "연결 성공 : "
                                 + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
-                    }
                     break;
                 case Constants.MESSAGE_TOAST:
-                    if (null != this) {
-                        Toast.makeText(MainActivity.this, msg.getData().getString(Constants.TOAST),
+                    Toast.makeText(MainActivity.this, msg.getData().getString(Constants.TOAST),
                                 Toast.LENGTH_SHORT).show();
-                    }
                     break;
             }
         }
