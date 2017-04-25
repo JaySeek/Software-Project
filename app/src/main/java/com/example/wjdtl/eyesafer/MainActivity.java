@@ -91,7 +91,6 @@ public class MainActivity extends Activity {
                     // 켠다면
                     Log.d(TAG, "BT not enabled");
                     Toast.makeText(this,"블루투스 ON",Toast.LENGTH_SHORT).show();
-                    finish();
                 }
                 else { // 켜지 않는다면
                     Log.d(TAG, "BT not enabled");
