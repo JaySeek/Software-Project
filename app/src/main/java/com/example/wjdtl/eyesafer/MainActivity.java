@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
             startActivityForResult(enableIntent,REQUEST_ENABLE_BT);
         }
         else if (mBluetoothService == null) {
-            // Bluetooth 연결을 위해 BluetoothService 초기화
+            // 이미 Enable 상태라면 Bluetooth 연결을 위해 BluetoothService 초기화
             mBluetoothService = new BluetoothService(this, mHandler);
         }
     }
@@ -90,7 +90,8 @@ public class MainActivity extends Activity {
                 if(resultCode == Activity.RESULT_OK) {
                     // 켠다면
                     Log.d(TAG, "BT not enabled");
-                    Toast.makeText(this,"블루투스 ON",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this,"블루투스 ON 상태",Toast.LENGTH_SHORT).show();
+                    mBluetoothService = new BluetoothService(this, mHandler);
                 }
                 else { // 켜지 않는다면
                     Log.d(TAG, "BT not enabled");
