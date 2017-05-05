@@ -231,16 +231,22 @@ public class BluetoothService {
         public void run() {
             byte[] buffer = new byte[1024];
             int bytes;
+            int receivedValue;
             StringBuilder readMessage = new StringBuilder();
             while (true) {
                 try {
                     //데이터 읽기
                     bytes = mInStream.read(buffer);
                     String tmpReceive = new String(buffer, 0, bytes);
-                    readMessage.append(tmpReceive);
-                    if(tmpReceive.contains("\n")) {
-                        mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
-                        readMessage.setLength(0);
+                    if(bytes < 5) {
+                        readMessage.append(tmpReceive);
+                        if(tmpReceive.contains("d")) {
+                            int index = readMessage.indexOf("d");
+                            receivedValue = Integer.valueOf(readMessage.substring(0,index));
+                            if(receivedValue <= 400)
+                            mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, receivedValue).sendToTarget();
+                            readMessage.setLength(0);
+                    }
                     }
                 } catch (IOException e) {
                     connectionLost();

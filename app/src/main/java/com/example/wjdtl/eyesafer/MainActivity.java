@@ -2,15 +2,21 @@ package com.example.wjdtl.eyesafer;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +34,13 @@ public class MainActivity extends Activity {
     private BluetoothAdapter mBluetoothAdapter = null; // BluetoothAdapter 클래스 접근 변수
     private BluetoothService mBluetoothService = null; // BluetoothService 클래스 접근 변수
 
+    int warnCount = 0;
+
+    PowerManager pm;
+    NotificationManager mNotiManager;
+    Notification noti;
+    Notification.Builder builder;
+
     TextView txtv;
 
     @Override
@@ -36,6 +49,21 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
+        mNotiManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        noti = new Notification();
+        noti.flags |= Notification.FLAG_AUTO_CANCEL;
+        noti.defaults = Notification.DEFAULT_ALL;
+        noti.when = System.currentTimeMillis();
+
+        builder = new Notification.Builder(this);
+        builder.setSmallIcon(R.drawable.ic_action_device_access_bluetooth_searching);
+        builder.setContentTitle("안녕");
+        builder.setContentText("헤헤");
+        builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
+
+        //noti = builder.build();
 
         txtv = (TextView)findViewById(R.id.textView);
 
@@ -133,11 +161,19 @@ public class MainActivity extends Activity {
                     }
                     break;
                 case Constants.MESSAGE_READ:
-                    // 메시지로 넘어온 데이터로 스트링 만듬
-                    String readMessage = (String)msg.obj;
-                    Log.e("Message","readMess : " + readMessage);
-                    if(readMessage.length() <= 5)
-                    txtv.setText("현재 거리는 " + readMessage);
+
+                    int distance = (int)msg.obj;
+                    boolean isSleepMode = pm.isScreenOn();
+                    if(isSleepMode) {
+                        txtv.setText("현재 거리는 " + distance);
+                        if(distance < 40) {
+                            warnCount++;
+                            Toast.makeText(MainActivity.this, "Warning " + warnCount, Toast.LENGTH_SHORT).show();
+
+                            mNotiManager.notify(0, noti);
+                        }
+                        Log.e("Message",Integer.valueOf(distance).toString());
+                    }
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // 장치명 저장
