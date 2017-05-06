@@ -2,9 +2,9 @@ package com.example.wjdtl.eyesafer;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -14,11 +14,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends Activity {
 
@@ -34,12 +38,18 @@ public class MainActivity extends Activity {
     private BluetoothAdapter mBluetoothAdapter = null; // BluetoothAdapter 클래스 접근 변수
     private BluetoothService mBluetoothService = null; // BluetoothService 클래스 접근 변수
 
-    int warnCount = 0;
+    private int warnCount = 0; // 경고 횟수
+    private int timeCounter = 0; // 시간 체크 카운터
+    private boolean isSafeDist = true;  // 안전 거리 유지 여부
 
     PowerManager pm;
     NotificationManager mNotiManager;
     Notification noti;
-    Notification.Builder builder;
+    Notification.Builder notibld;
+  //  AlertDialog.Builder bld;
+
+    TimerTask tt;
+    Timer timer;
 
     TextView txtv;
 
@@ -51,19 +61,15 @@ public class MainActivity extends Activity {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
+
         mNotiManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        noti = new Notification();
-        noti.flags |= Notification.FLAG_AUTO_CANCEL;
-        noti.defaults = Notification.DEFAULT_ALL;
-        noti.when = System.currentTimeMillis();
 
-        builder = new Notification.Builder(this);
-        builder.setSmallIcon(R.drawable.ic_action_device_access_bluetooth_searching);
-        builder.setContentTitle("안녕");
-        builder.setContentText("헤헤");
-        builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
+        notibld = new Notification.Builder(this);
+        notibld.setSmallIcon(R.drawable.ic_action_device_access_bluetooth_searching);
+        notibld.setContentTitle("타이틀임");
+        notibld.setContentText("내용임");
 
-        //noti = builder.build();
+      //  bld = new AlertDialog.Builder(this);
 
         txtv = (TextView)findViewById(R.id.textView);
 
@@ -105,6 +111,15 @@ public class MainActivity extends Activity {
         if (mBluetoothService != null) {
             mBluetoothService.stop();
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                return true; // BACK 버튼 눌러도 앱 종료 X
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override // startActivityforResult 에서 호출한 Activity 결과값 return 처리
@@ -161,18 +176,10 @@ public class MainActivity extends Activity {
                     }
                     break;
                 case Constants.MESSAGE_READ:
-
                     int distance = (int)msg.obj;
                     boolean isSleepMode = pm.isScreenOn();
                     if(isSleepMode) {
-                        txtv.setText("현재 거리는 " + distance);
-                        if(distance < 40) {
-                            warnCount++;
-                            Toast.makeText(MainActivity.this, "Warning " + warnCount, Toast.LENGTH_SHORT).show();
-
-                            mNotiManager.notify(0, noti);
-                        }
-                        Log.e("Message",Integer.valueOf(distance).toString());
+                        alertDistance(distance);
                     }
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
@@ -188,6 +195,62 @@ public class MainActivity extends Activity {
             }
         }
     };
+
+    private void alertDistance(int distance) {
+        txtv.setText("현재 거리는 " + distance);
+        Log.e("Message",Integer.valueOf(distance).toString());
+        if(distance < 40) { // 거리가 40cm 미만일 경우
+            Toast toast = Toast.makeText(MainActivity.this, warnCount + "차 경고", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER,0,0);
+            switch(warnCount) {
+                case 0 :
+                    mNotiManager.notify(0, notibld.getNotification());
+                    warnCount++;
+                    isSafeDist = false;
+                    toast.show();
+                    Log.e("1차 경고", "거리 유지");
+                    tt = new TimerTask() {
+                        @Override
+                        public void run() {
+                            if(!isSafeDist)
+                                timeCounter++;
+                            else if(isSafeDist)
+                                tt.cancel();
+                        }
+                    };
+                    timer = new Timer();
+                    timer.schedule(tt, 0, 1000);
+                    break;
+                case 1 :
+                    if(timeCounter == 5) {
+                        Log.e("2차 경고", "거리 유지!");
+                        toast.show();
+                        warnCount++;
+                    }
+                    break;
+                case 2 :
+                    Log.e("2차 경고 무시", "밝기 제한됨");
+                    toast.show();
+                    // 밝기 제한
+                    break;
+            }
+            /* bld.setTitle("알림");
+                            bld.setMessage("대화상자 오픈");
+                            bld.setIcon(R.drawable.ic_action_device_access_bluetooth_searching);
+                            bld.setPositiveButton("닫기", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Log.e("닫기","닫기 클릭함");
+                                }
+                            });
+                            // bld.show();*/
+        }
+        else { // 안전 거리를 유지한다면
+            isSafeDist = true;
+            warnCount = 0;
+            timeCounter = 0;
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
