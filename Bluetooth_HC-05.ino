@@ -14,7 +14,8 @@ void setup() {
 
 void loop() {
     delay(300);
-    BTSerial.println(calDistance());
+    BTSerial.print(calDistance());
+    BTSerial.print("d");
 }
 
 long calDistance() {
