@@ -102,7 +102,6 @@ public class DeviceListActivity extends Activity {
     }
 
     private void doDiscovery() {
-
         setTitle("블루투스 장치 검색 중");
         findViewById(R.id.title_new_devices).setVisibility(View.VISIBLE);
 
@@ -148,8 +147,8 @@ public class DeviceListActivity extends Activity {
                             mNewDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
                     }
                 }
-            // 디바이스 찾기가 끝나면 타이틀 변경
-            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                // 디바이스 찾기가 끝나면 타이틀 변경
+                else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 setTitle("연결할 디바이스를 선택하시오");
                 if (mNewDevicesArrayAdapter.getCount() == 0) {
                     String noDevices = "검색된 디바이스 없음";

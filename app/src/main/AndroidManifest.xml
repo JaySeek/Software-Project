@@ -7,7 +7,13 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <!-- 자동 실행 리시버 권한 등록 -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- 시스템 화면 밝기 조절 권한 등록 -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+
+    <!-- 현재 Task 반환 권한 등록 -->
+    <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
         android:allowBackup="true"
@@ -22,19 +28,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <receiver
             android:name=".StartReceiver"
             android:enabled="true"
             android:exported="false"
             android:label="StartReceiver">
-
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
         <activity
             android:name=".DeviceListActivity"
             android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name=".BrightnessActivity"
+            android:excludeFromRecents="true"
+            android:theme="@style/EmptyActivity">
+        </activity>
     </application>
 
 </manifest>
