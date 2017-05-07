@@ -1,0 +1,19 @@
+package com.example.wjdtl.eyesafer;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+
+public class StartReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        String action = intent.getAction();
+        if(action.equals("android.intent.action.BOOT_COMPLETED")) {
+            Intent i = new Intent(context, MainActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // 새 Task에서 Activity 시작
+            context.startActivity(i);
+        }
+
+    }
+}
