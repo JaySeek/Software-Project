@@ -72,8 +72,8 @@ public class MainActivity extends Activity {
 
         notibld = new Notification.Builder(this);
         notibld.setSmallIcon(R.drawable.ic_action_device_access_bluetooth_searching);
-        notibld.setContentTitle("타이틀임");
-        notibld.setContentText("내용임");
+        notibld.setContentTitle("기본 타이틀");
+        notibld.setContentText("기본 내용");
 
         tTimerTask = new TimerTask() {
                 @Override
@@ -222,14 +222,17 @@ public class MainActivity extends Activity {
         txtv.setText("현재 거리는 " + distance);
         //Log.e("Message",Integer.valueOf(distance).toString());
         if(distance < 40) { // 거리가 40cm 미만일 경우
-            Toast toast = Toast.makeText(MainActivity.this, warnCount + "차 경고", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(MainActivity.this,"", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER,0,0);
             switch(warnCount) {
                 case 0 : // 1차 경고
+                    notibld.setContentTitle("1차 경고");
+                    notibld.setContentText("거리 유지 필요");
                     mNotiManager.notify(0, notibld.getNotification());
                     warnCount++;
-                    isSafeDist = false;
+                    toast.setText("1차 경고");
                     toast.show();
+                    isSafeDist = false;
                     distTimerTask = new TimerTask() {
                         @Override
                         public void run() {
@@ -249,8 +252,12 @@ public class MainActivity extends Activity {
                         } catch (Settings.SettingNotFoundException e) {
                             e.printStackTrace();
                         }
-                        setBrightness(1);
+                        toast.setText("2차 경고, 밝기 제한됨");
                         toast.show();
+                        notibld.setContentTitle("2차 경고");
+                        notibld.setContentText("밝기 제한");
+                        mNotiManager.notify(1, notibld.getNotification());
+                        setBrightness(1);
                         warnCount = -1;
                     }
                     if(isSafeDist) {
