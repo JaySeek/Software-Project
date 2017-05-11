@@ -15,11 +15,12 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.WindowManager;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,9 +49,11 @@ public class MainActivity extends Activity {
 
     private int currentBright = 0; // 현재 밝기 값
 
+    private int alertCount = 0;
+
     PowerManager pm;
     NotificationManager mNotiManager;
-    Notification.Builder notibld;
+    Notification.Builder distNoti;
 
     TimerTask distTimerTask;
     TimerTask tTimerTask;
@@ -58,6 +61,8 @@ public class MainActivity extends Activity {
     Timer tTimer;
 
     TextView txtv;
+
+    Toast toastAlert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +75,11 @@ public class MainActivity extends Activity {
 
         mNotiManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
-        notibld = new Notification.Builder(this);
-        notibld.setSmallIcon(R.drawable.ic_action_device_access_bluetooth_searching);
-        notibld.setContentTitle("기본 타이틀");
-        notibld.setContentText("기본 내용");
+        distNoti = new Notification.Builder(this);
+        distNoti.setSmallIcon(R.drawable.ic_action_device_access_bluetooth_searching);
+        distNoti.setContentTitle("기본 타이틀");
+        distNoti.setContentText("기본 내용");
+        distNoti.setAutoCancel(true);
 
         tTimerTask = new TimerTask() {
                 @Override
@@ -85,6 +91,9 @@ public class MainActivity extends Activity {
         tTimer.schedule(tTimerTask, 0, 1000);
 
         txtv = (TextView)findViewById(R.id.textView);
+        toastAlert = Toast.makeText(MainActivity.this,"",Toast.LENGTH_SHORT);
+        toastAlert.setGravity(Gravity.CENTER,0,0);
+        toastAlert.setDuration(Toast.LENGTH_SHORT);
 
         try {
             if(Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) != 0) {
@@ -220,18 +229,17 @@ public class MainActivity extends Activity {
 
     private void alertDistance(int distance) {
         txtv.setText("현재 거리는 " + distance);
-        //Log.e("Message",Integer.valueOf(distance).toString());
         if(distance < 40) { // 거리가 40cm 미만일 경우
-            Toast toast = Toast.makeText(MainActivity.this,"", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER,0,0);
+            ViewGroup group = (ViewGroup) toastAlert.getView();
+            TextView msgTV = (TextView) group.getChildAt(0);
+            msgTV.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 40);
             switch(warnCount) {
                 case 0 : // 1차 경고
-                    notibld.setContentTitle("1차 경고");
-                    notibld.setContentText("거리 유지 필요");
-                    mNotiManager.notify(0, notibld.getNotification());
-                    warnCount++;
-                    toast.setText("1차 경고");
-                    toast.show();
+                    distNoti.setContentTitle("1차 경고");
+                    distNoti.setContentText("거리 유지 필요");
+                    mNotiManager.notify(alertCount++, distNoti.getNotification());
+                    toastAlert.setText("1차 경고");
+                    toastAlert.show();
                     isSafeDist = false;
                     distTimerTask = new TimerTask() {
                         @Override
@@ -244,19 +252,22 @@ public class MainActivity extends Activity {
                     };
                     distTimer = new Timer();
                     distTimer.schedule(distTimerTask, 0, 1000);
+                    warnCount++;
                     break;
                 case 1 : // 2차 경고, 밝기 제한
                     if(distTimeCounter == 5) {
+                        mNotiManager.cancelAll();
+                        alertCount = 0;
                         try {
                             currentBright = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
                         } catch (Settings.SettingNotFoundException e) {
                             e.printStackTrace();
                         }
-                        toast.setText("2차 경고, 밝기 제한됨");
-                        toast.show();
-                        notibld.setContentTitle("2차 경고");
-                        notibld.setContentText("밝기 제한");
-                        mNotiManager.notify(1, notibld.getNotification());
+                        distNoti.setContentTitle("2차 경고");
+                        distNoti.setContentText("밝기 제한");
+                        toastAlert.setText("2차 경고, 밝기 제한");
+                        toastAlert.show();
+                        mNotiManager.notify(alertCount++, distNoti.getNotification());
                         setBrightness(1);
                         warnCount = -1;
                     }
@@ -269,7 +280,10 @@ public class MainActivity extends Activity {
         else { // 안전 거리를 유지한다면
             isSafeDist = true;
             distTimeCounter = 0;
+            mNotiManager.cancelAll();
+            alertCount = 0;
             if(warnCount == -1) {
+
                 setBrightness(0);
                 warnCount = 0;
             }
