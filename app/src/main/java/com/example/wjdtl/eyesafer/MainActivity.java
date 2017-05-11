@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
         mNotiManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
         distNoti = new Notification.Builder(this);
-        distNoti.setSmallIcon(R.drawable.ic_action_device_access_bluetooth_searching);
+        distNoti.setSmallIcon(R.drawable.ic_noti_alert);
         distNoti.setContentTitle("기본 타이틀");
         distNoti.setContentText("기본 내용");
         distNoti.setAutoCancel(true);
