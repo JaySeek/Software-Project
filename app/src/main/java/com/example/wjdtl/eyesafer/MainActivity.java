@@ -43,12 +43,20 @@ public class MainActivity extends Activity {
     private BluetoothService mBluetoothService = null; // BluetoothService 클래스 접근 변수
 
     private int warnCount = 0; // 경고 횟수
-    private int distTimeCounter = 0; // 시간 체크 카운터
-    private int tTimeCounter = 0;
+    private int distTimeCounter = 0; // 거리 경고 시간 체크 카운터
+    private int tTimeCounter = 0; // 사용 시간 체크 카운터
+    private int rTimeCounter = 0; // 휴식 시간 체크 카운터
+
+    private static final int T_TIME_LIMIT = 16; // 사용 시간 제한 기준(초)
+    private static final int T_TIME_REST = 5; // 휴식 시간 기준(초)
+
     private boolean isSafeDist = true;  // 안전 거리 유지 여부
+    private boolean isNeedRest = false; // 휴식 필요 여부
+    private boolean isRestComp = true; // 휴식 완료 여부
+    private boolean isRestMegPr = false; // 휴식 더 필요하다는 메시지 출력 여부
+    private boolean isAutoBright = false; // 자동 밝기 ON/OFF 여부
 
     private int currentBright = 0; // 현재 밝기 값
-
     private int alertCount = 0;
 
     PowerManager pm;
@@ -63,6 +71,7 @@ public class MainActivity extends Activity {
     TextView txtv;
 
     Toast toastAlert;
+    Toast toastTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,28 +93,63 @@ public class MainActivity extends Activity {
         tTimerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    tTimeCounter++;
+                    if (pm.isScreenOn()) {
+                        tTimeCounter++;
+                        if (tTimeCounter == T_TIME_LIMIT) { // 제한이 필요한 시간이 누적될 경우 알림
+                            tHandler.sendEmptyMessage(0);
+                            isNeedRest = true;
+                        }
+                        if(tTimeCounter > T_TIME_LIMIT && isNeedRest) {
+                           tTimeCounter /= 2; // 정해진 시간의 휴식을 취하지 않고 사용할 경우 제한 시간의 절반만 사용해도 알림 출력
+                        }
+                        if(isNeedRest && !isRestComp && !isRestMegPr) { // 정해진 휴식 시간을 채우지 못한 경우 1회에 한하여 출력
+                            tHandler.sendEmptyMessage(1);
+                        }
+                    } else {
+                        if (isNeedRest) {
+                            rTimeCounter++;
+                            if (rTimeCounter >= T_TIME_REST) { // 설정한 휴식 시간에 도달
+                                tTimeCounter = 0;
+                                rTimeCounter = 0;
+                                isNeedRest = false;
+                                isRestComp = true;
+                                isRestMegPr = false;
+                            }
+                            else { // 설정한 휴식 시간에 도달 X
+                                isRestComp = false;
+                            }
+                        }
+                        else // 휴식할 필요가 없지만 충분한 휴식을 취할 경우
+                            if(rTimeCounter >= T_TIME_REST) {
+                                tTimeCounter = 0;
+                                rTimeCounter = 0;
+                                isNeedRest = false;
+                                isRestComp = true;
+                            }
+                    }
                 }
             };
         tTimer = new Timer();
         tTimer.schedule(tTimerTask, 0, 1000);
 
         txtv = (TextView)findViewById(R.id.textView);
+
         toastAlert = Toast.makeText(MainActivity.this,"",Toast.LENGTH_SHORT);
         toastAlert.setGravity(Gravity.CENTER,0,0);
-        toastAlert.setDuration(Toast.LENGTH_SHORT);
 
-        try {
-            if(Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) != 0) {
-                Settings.System.putInt(getContentResolver(),Settings.System.SCREEN_BRIGHTNESS_MODE, 0);
-            }
-        }
-        catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-        }
+        ViewGroup group = (ViewGroup) toastAlert.getView();
+        TextView msgTV = (TextView) group.getChildAt(0);
+        msgTV.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 40);
+
+        toastTime = Toast.makeText(MainActivity.this,"",Toast.LENGTH_SHORT);
+        toastTime.setGravity(Gravity.CENTER,0,0);
+
+        group = (ViewGroup) toastTime.getView();
+        msgTV = (TextView) group.getChildAt(0);
+        msgTV.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 40);
 
         if (mBluetoothAdapter == null) { // 기기에 Bluetooth 장치가 없을 경우
-            Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "블루투스 기능이 없는 장치입니다.", Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -187,6 +231,23 @@ public class MainActivity extends Activity {
         actionBar.setSubtitle(resId);
     }
 
+    private final Handler tHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+                    toastTime.setText("사용 시간 경과, 휴식 필요");
+                    toastTime.show();
+                    break;
+                case 1:
+                    toastTime.setText("더 휴식을 취해주세요.");
+                    toastTime.show();
+                    isRestMegPr = true;
+                    break;
+            }
+        }
+    };
+
     //BluetoothService로부터 오는 정보를 받아오는 Handler
     private final Handler mHandler = new Handler() {
         @Override
@@ -228,11 +289,8 @@ public class MainActivity extends Activity {
     };
 
     private void alertDistance(int distance) {
-        txtv.setText("현재 거리는 " + distance);
+        txtv.setText("거리 : " + distance + "cm\n 사용 시간 : " + tTimeCounter + "초");
         if(distance < 40) { // 거리가 40cm 미만일 경우
-            ViewGroup group = (ViewGroup) toastAlert.getView();
-            TextView msgTV = (TextView) group.getChildAt(0);
-            msgTV.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 40);
             switch(warnCount) {
                 case 0 : // 1차 경고
                     distNoti.setContentTitle("1차 경고");
@@ -258,8 +316,12 @@ public class MainActivity extends Activity {
                     if(distTimeCounter == 5) {
                         mNotiManager.cancelAll();
                         alertCount = 0;
-                        try {
+                        try { // 자동 밝기 기능이 켜져있을 경우 해제 및 현재 밝기값 저장
                             currentBright = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+                            if(Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) != 0) {
+                                isAutoBright = true;
+                                Settings.System.putInt(getContentResolver(),Settings.System.SCREEN_BRIGHTNESS_MODE, 0);
+                            }
                         } catch (Settings.SettingNotFoundException e) {
                             e.printStackTrace();
                         }
@@ -283,8 +345,16 @@ public class MainActivity extends Activity {
             mNotiManager.cancelAll();
             alertCount = 0;
             if(warnCount == -1) {
-
                 setBrightness(0);
+                if(isAutoBright) { // 기존에 자동 밝기 기능 사용시 원래대로 복귀
+                    try {
+                        if (Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) != 1) {
+                            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, 1);
+                        }
+                    } catch (Settings.SettingNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
                 warnCount = 0;
             }
         }
