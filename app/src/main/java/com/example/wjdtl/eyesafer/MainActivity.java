@@ -68,7 +68,8 @@ public class MainActivity extends Activity {
     Timer distTimer;
     Timer tTimer;
 
-    TextView txtv;
+    TextView nowDistTxt;
+    TextView nowTimeTxt;
 
     Toast toastAlert;
     Toast toastTime;
@@ -90,20 +91,24 @@ public class MainActivity extends Activity {
         distNoti.setContentText("기본 내용");
         distNoti.setAutoCancel(true);
 
+        nowDistTxt = (TextView)findViewById(R.id.nowDistTxt);
+        nowTimeTxt = (TextView)findViewById(R.id.nowUseTimeTxt);
+
         tTimerTask = new TimerTask() {
                 @Override
                 public void run() {
                     if (pm.isScreenOn()) {
+                        tHandler.sendEmptyMessage(0);
                         tTimeCounter++;
                         if (tTimeCounter == T_TIME_LIMIT) { // 제한이 필요한 시간이 누적될 경우 알림
-                            tHandler.sendEmptyMessage(0);
+                            tHandler.sendEmptyMessage(1);
                             isNeedRest = true;
                         }
                         if(tTimeCounter > T_TIME_LIMIT && isNeedRest) {
                            tTimeCounter /= 2; // 정해진 시간의 휴식을 취하지 않고 사용할 경우 제한 시간의 절반만 사용해도 알림 출력
                         }
                         if(isNeedRest && !isRestComp && !isRestMegPr) { // 정해진 휴식 시간을 채우지 못한 경우 1회에 한하여 출력
-                            tHandler.sendEmptyMessage(1);
+                            tHandler.sendEmptyMessage(2);
                         }
                     } else {
                         if (isNeedRest) {
@@ -131,8 +136,6 @@ public class MainActivity extends Activity {
             };
         tTimer = new Timer();
         tTimer.schedule(tTimerTask, 0, 1000);
-
-        txtv = (TextView)findViewById(R.id.textView);
 
         toastAlert = Toast.makeText(MainActivity.this,"",Toast.LENGTH_SHORT);
         toastAlert.setGravity(Gravity.CENTER,0,0);
@@ -236,10 +239,13 @@ public class MainActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
+                    nowTimeTxt.setText("사용 시간 : " + tTimeCounter + "초");
+                    break;
+                case 1:
                     toastTime.setText("사용 시간 경과, 휴식 필요");
                     toastTime.show();
                     break;
-                case 1:
+                case 2:
                     toastTime.setText("더 휴식을 취해주세요.");
                     toastTime.show();
                     isRestMegPr = true;
@@ -289,7 +295,7 @@ public class MainActivity extends Activity {
     };
 
     private void alertDistance(int distance) {
-        txtv.setText("거리 : " + distance + "cm\n 사용 시간 : " + tTimeCounter + "초");
+        nowDistTxt.setText("거리 : " + distance + "cm");
         if(distance < 40) { // 거리가 40cm 미만일 경우
             switch(warnCount) {
                 case 0 : // 1차 경고
