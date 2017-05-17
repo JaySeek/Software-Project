@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
     private int tTimeCounter = 0; // 사용 시간 체크 카운터
     private int rTimeCounter = 0; // 휴식 시간 체크 카운터
 
-    private static final int T_TIME_LIMIT = 16; // 사용 시간 제한 기준(초)
+    private static final int T_TIME_LIMIT = 20; // 사용 시간 제한 기준(초)
     private static final int T_TIME_REST = 5; // 휴식 시간 기준(초)
 
     private boolean isSafeDist = true;  // 안전 거리 유지 여부
@@ -55,6 +55,7 @@ public class MainActivity extends Activity {
     private boolean isRestComp = true; // 휴식 완료 여부
     private boolean isRestMegPr = false; // 휴식 더 필요하다는 메시지 출력 여부
     private boolean isAutoBright = false; // 자동 밝기 ON/OFF 여부
+    private boolean isCompMsg = false; // 휴식 완료 메시지 출력 여부
 
     private int currentBright = 0; // 현재 밝기 값
     private int alertCount = 0;
@@ -98,18 +99,20 @@ public class MainActivity extends Activity {
                 @Override
                 public void run() {
                     if (pm.isScreenOn()) {
+                        if(isCompMsg) {
+                            tHandler.sendEmptyMessage(3);
+                            isCompMsg = false;
+                        }
                         tHandler.sendEmptyMessage(0);
                         tTimeCounter++;
                         if (tTimeCounter == T_TIME_LIMIT) { // 제한이 필요한 시간이 누적될 경우 알림
                             tHandler.sendEmptyMessage(1);
                             isNeedRest = true;
                         }
-                        if(tTimeCounter > T_TIME_LIMIT && isNeedRest) {
+                        if(tTimeCounter > T_TIME_LIMIT && isNeedRest)
                            tTimeCounter /= 2; // 정해진 시간의 휴식을 취하지 않고 사용할 경우 제한 시간의 절반만 사용해도 알림 출력
-                        }
-                        if(isNeedRest && !isRestComp && !isRestMegPr) { // 정해진 휴식 시간을 채우지 못한 경우 1회에 한하여 출력
+                        if(isNeedRest && !isRestComp && !isRestMegPr)  // 정해진 휴식 시간을 채우지 못한 경우 1회에 한하여 출력
                             tHandler.sendEmptyMessage(2);
-                        }
                     } else {
                         if (isNeedRest) {
                             rTimeCounter++;
@@ -119,6 +122,7 @@ public class MainActivity extends Activity {
                                 isNeedRest = false;
                                 isRestComp = true;
                                 isRestMegPr = false;
+                                isCompMsg = true;
                             }
                             else { // 설정한 휴식 시간에 도달 X
                                 isRestComp = false;
@@ -246,9 +250,13 @@ public class MainActivity extends Activity {
                     toastTime.show();
                     break;
                 case 2:
-                    toastTime.setText("더 휴식을 취해주세요.");
+                    toastTime.setText("휴식 시간이 부족합니다.");
                     toastTime.show();
                     isRestMegPr = true;
+                    break;
+                case 3:
+                    toastTime.setText("충분한 휴식을 취했습니다.");
+                    toastTime.show();
                     break;
             }
         }
