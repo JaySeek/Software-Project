@@ -4,15 +4,13 @@
     <!-- MainActivity -->
     <string name="connecting">연결중...</string>
     <string name="not_connected">연결된 장치가 없음</string>
-    <string name="connected_device_name">연결됨 : </string>
+    <string name="connected_device_name">연결됨</string>
 
-    <!-- DeviceListActivity -->
-    <string name="paired_devices">페어링된 장치</string>
-    <string name="other_devices">검색된 다른 장치</string>
-    <string name="button_scan">장치 검색</string>
+    <string name="main_distmonitor">거리 모니터링</string>
+    <string name="main_timemonitor">시간 모니터링</string>
 
     <!-- Menu -->
     <string name="menu_device_search">디바이스 검색</string>
-    <string name="menu1">메뉴1</string>
-    <string name="menu2">메뉴2</string>
+    <string name="menu1">가이드</string>
+    <string name="menu2">임시</string>
 </resources>

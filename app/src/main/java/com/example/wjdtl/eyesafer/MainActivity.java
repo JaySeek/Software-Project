@@ -82,9 +82,9 @@ public class MainActivity extends Activity {
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
+        pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
-        mNotiManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        mNotiManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         distNoti = new Notification.Builder(this);
         distNoti.setSmallIcon(R.drawable.ic_noti_alert);
@@ -92,64 +92,62 @@ public class MainActivity extends Activity {
         distNoti.setContentText("기본 내용");
         distNoti.setAutoCancel(true);
 
-        nowDistTxt = (TextView)findViewById(R.id.nowDistTxt);
-        nowTimeTxt = (TextView)findViewById(R.id.nowUseTimeTxt);
+        nowDistTxt = (TextView) findViewById(R.id.nowDistTxt);
+        nowTimeTxt = (TextView) findViewById(R.id.nowUseTimeTxt);
 
         tTimerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    if (pm.isScreenOn()) {
-                        if(isCompMsg) {
-                            tHandler.sendEmptyMessage(3);
-                            isCompMsg = false;
-                        }
-                        tHandler.sendEmptyMessage(0);
-                        tTimeCounter++;
-                        if (tTimeCounter == T_TIME_LIMIT) { // 제한이 필요한 시간이 누적될 경우 알림
-                            tHandler.sendEmptyMessage(1);
-                            isNeedRest = true;
-                        }
-                        if(tTimeCounter > T_TIME_LIMIT && isNeedRest)
-                           tTimeCounter /= 2; // 정해진 시간의 휴식을 취하지 않고 사용할 경우 제한 시간의 절반만 사용해도 알림 출력
-                        if(isNeedRest && !isRestComp && !isRestMegPr)  // 정해진 휴식 시간을 채우지 못한 경우 1회에 한하여 출력
-                            tHandler.sendEmptyMessage(2);
-                    } else {
-                        if (isNeedRest) {
-                            rTimeCounter++;
-                            if (rTimeCounter >= T_TIME_REST) { // 설정한 휴식 시간에 도달
-                                tTimeCounter = 0;
-                                rTimeCounter = 0;
-                                isNeedRest = false;
-                                isRestComp = true;
-                                isRestMegPr = false;
-                                isCompMsg = true;
-                            }
-                            else { // 설정한 휴식 시간에 도달 X
-                                isRestComp = false;
-                            }
-                        }
-                        else // 휴식할 필요가 없지만 충분한 휴식을 취할 경우
-                            if(rTimeCounter >= T_TIME_REST) {
-                                tTimeCounter = 0;
-                                rTimeCounter = 0;
-                                isNeedRest = false;
-                                isRestComp = true;
-                            }
+            @Override
+            public void run() {
+                if (pm.isScreenOn()) {
+                    if (isCompMsg) {
+                        tHandler.sendEmptyMessage(3);
+                        isCompMsg = false;
                     }
+                    tHandler.sendEmptyMessage(0);
+                    tTimeCounter++;
+                    if (tTimeCounter == T_TIME_LIMIT) { // 제한이 필요한 시간이 누적될 경우 알림
+                        tHandler.sendEmptyMessage(1);
+                        isNeedRest = true;
+                    }
+                    if (tTimeCounter > T_TIME_LIMIT && isNeedRest)
+                        tTimeCounter /= 2; // 정해진 시간의 휴식을 취하지 않고 사용할 경우 제한 시간의 절반만 사용해도 알림 출력
+                    if (isNeedRest && !isRestComp && !isRestMegPr)  // 정해진 휴식 시간을 채우지 못한 경우 1회에 한하여 출력
+                        tHandler.sendEmptyMessage(2);
+                } else {
+                    if (isNeedRest) {
+                        rTimeCounter++;
+                        if (rTimeCounter >= T_TIME_REST) { // 설정한 휴식 시간에 도달
+                            tTimeCounter = 0;
+                            rTimeCounter = 0;
+                            isNeedRest = false;
+                            isRestComp = true;
+                            isRestMegPr = false;
+                            isCompMsg = true;
+                        } else { // 설정한 휴식 시간에 도달 X
+                            isRestComp = false;
+                        }
+                    } else // 휴식할 필요가 없지만 충분한 휴식을 취할 경우
+                        if (rTimeCounter >= T_TIME_REST) {
+                            tTimeCounter = 0;
+                            rTimeCounter = 0;
+                            isNeedRest = false;
+                            isRestComp = true;
+                        }
                 }
-            };
+            }
+        };
         tTimer = new Timer();
         tTimer.schedule(tTimerTask, 0, 1000);
 
-        toastAlert = Toast.makeText(MainActivity.this,"",Toast.LENGTH_SHORT);
-        toastAlert.setGravity(Gravity.CENTER,0,0);
+        toastAlert = Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT);
+        toastAlert.setGravity(Gravity.CENTER, 0, 0);
 
         ViewGroup group = (ViewGroup) toastAlert.getView();
         TextView msgTV = (TextView) group.getChildAt(0);
         msgTV.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 40);
 
-        toastTime = Toast.makeText(MainActivity.this,"",Toast.LENGTH_SHORT);
-        toastTime.setGravity(Gravity.CENTER,0,0);
+        toastTime = Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT);
+        toastTime.setGravity(Gravity.CENTER, 0, 0);
 
         group = (ViewGroup) toastTime.getView();
         msgTV = (TextView) group.getChildAt(0);
@@ -159,6 +157,7 @@ public class MainActivity extends Activity {
             Toast.makeText(this, "블루투스 기능이 없는 장치입니다.", Toast.LENGTH_LONG).show();
             finish();
         }
+
     }
 
     @Override
@@ -169,11 +168,11 @@ public class MainActivity extends Activity {
             // 블루투스를 Enable 시키기 위한 암시적인 Intent 객체 생성
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             // Bluetooth 활성화 Activity(대화상자) 호출
-            startActivityForResult(enableIntent,REQUEST_ENABLE_BT);
-        }
-        else if (mBluetoothService == null) {
+            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        } else if (mBluetoothService == null) {
             // 이미 Enable 상태라면 Bluetooth 연결을 위해 BluetoothService 초기화
             mBluetoothService = new BluetoothService(this, mHandler);
+            connectActivity();
         }
     }
 
@@ -206,21 +205,20 @@ public class MainActivity extends Activity {
 
     @Override // startActivityforResult 에서 호출한 Activity 결과값 return 처리
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch(requestCode) {
-            case REQUEST_CONNECT_DEVICE : // 블루투스 Connect 목적의 Intent 요청일 경우
-                if(resultCode != 0)
+        switch (requestCode) {
+            case REQUEST_CONNECT_DEVICE: // 블루투스 Connect 목적의 Intent 요청일 경우
                 connectDevice(data);
                 break;
             case REQUEST_ENABLE_BT: // 블루투스를 Enable 시키기 위한 요청 코드일 경우
-                if(resultCode == Activity.RESULT_OK) {
+                if (resultCode == Activity.RESULT_OK) {
                     // 켠다면
                     Log.d(TAG, "BT not enabled");
-                    Toast.makeText(this,"블루투스 ON 상태",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "블루투스 ON 상태, 장치를 연결합니다.", Toast.LENGTH_SHORT).show();
                     mBluetoothService = new BluetoothService(this, mHandler);
-                }
-                else { // 켜지 않는다면
+                    connectActivity();
+                } else { // 켜지 않는다면
                     Log.d(TAG, "BT not enabled");
-                    Toast.makeText(this,"블루투스 OFF 상태, \n앱을 종료합니다.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "블루투스 OFF 상태, \n앱을 종료합니다.", Toast.LENGTH_SHORT).show();
                     finish();
                 }
         }
@@ -270,7 +268,7 @@ public class MainActivity extends Activity {
                 case Constants.MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case BluetoothService.STATE_CONNECTED:
-                            setStatus(getString(R.string.connected_device_name) + mConnectedDeviceName);
+                            setStatus(getString(R.string.connected_device_name));
                             break;
                         case BluetoothService.STATE_CONNECTING:
                             setStatus(R.string.connecting);
@@ -282,21 +280,20 @@ public class MainActivity extends Activity {
                     }
                     break;
                 case Constants.MESSAGE_READ:
-                    int distance = (int)msg.obj;
+                    int distance = (int) msg.obj;
                     boolean isSleepMode = pm.isScreenOn();
-                    if(isSleepMode) {
+                    if (isSleepMode) {
                         alertDistance(distance);
                     }
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // 장치명 저장
                     mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
-                    Toast.makeText(MainActivity.this, "연결 성공 : "
-                                + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "연결 성공", Toast.LENGTH_SHORT).show();
                     break;
                 case Constants.MESSAGE_TOAST:
                     Toast.makeText(MainActivity.this, msg.getData().getString(Constants.TOAST),
-                                Toast.LENGTH_SHORT).show();
+                            Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -304,9 +301,9 @@ public class MainActivity extends Activity {
 
     private void alertDistance(int distance) {
         nowDistTxt.setText("거리 : " + distance + "cm");
-        if(distance < 40) { // 거리가 40cm 미만일 경우
-            switch(warnCount) {
-                case 0 : // 1차 경고
+        if (distance < 40) { // 거리가 40cm 미만일 경우
+            switch (warnCount) {
+                case 0: // 1차 경고
                     distNoti.setContentTitle("1차 경고");
                     distNoti.setContentText("거리 유지 필요");
                     mNotiManager.notify(alertCount++, distNoti.getNotification());
@@ -316,9 +313,9 @@ public class MainActivity extends Activity {
                     distTimerTask = new TimerTask() {
                         @Override
                         public void run() {
-                            if(!isSafeDist)
+                            if (!isSafeDist)
                                 distTimeCounter++;
-                            else if(isSafeDist)
+                            else if (isSafeDist)
                                 distTimerTask.cancel();
                         }
                     };
@@ -326,15 +323,15 @@ public class MainActivity extends Activity {
                     distTimer.schedule(distTimerTask, 0, 1000);
                     warnCount++;
                     break;
-                case 1 : // 2차 경고, 밝기 제한
-                    if(distTimeCounter == 5) {
+                case 1: // 2차 경고, 밝기 제한
+                    if (distTimeCounter == 5) {
                         mNotiManager.cancelAll();
                         alertCount = 0;
                         try { // 자동 밝기 기능이 켜져있을 경우 해제 및 현재 밝기값 저장
                             currentBright = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
-                            if(Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) != 0) {
+                            if (Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) != 0) {
                                 isAutoBright = true;
-                                Settings.System.putInt(getContentResolver(),Settings.System.SCREEN_BRIGHTNESS_MODE, 0);
+                                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, 0);
                             }
                         } catch (Settings.SettingNotFoundException e) {
                             e.printStackTrace();
@@ -347,20 +344,19 @@ public class MainActivity extends Activity {
                         setBrightness(1);
                         warnCount = -1;
                     }
-                    if(isSafeDist) {
+                    if (isSafeDist) {
                         warnCount = 0;
                     }
                     break;
             }
-        }
-        else { // 안전 거리를 유지한다면
+        } else { // 안전 거리를 유지한다면
             isSafeDist = true;
             distTimeCounter = 0;
             mNotiManager.cancelAll();
             alertCount = 0;
-            if(warnCount == -1) {
+            if (warnCount == -1) {
                 setBrightness(0);
-                if(isAutoBright) { // 기존에 자동 밝기 기능 사용시 원래대로 복귀
+                if (isAutoBright) { // 기존에 자동 밝기 기능 사용시 원래대로 복귀
                     try {
                         if (Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) != 1) {
                             Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, 1);
@@ -382,24 +378,24 @@ public class MainActivity extends Activity {
             intent.putExtra("finish Task", "background");
         }
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        switch(num) {
+        switch (num) {
             case 0:
-                intent.putExtra("window bright",1f);
-                Settings.System.putInt(getContentResolver(),Settings.System.SCREEN_BRIGHTNESS,currentBright);
+                intent.putExtra("window bright", 1f);
+                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, currentBright);
                 break;
             case 1:
                 intent.putExtra("window bright", 0.1f);
-                Settings.System.putInt(getContentResolver(),Settings.System.SCREEN_BRIGHTNESS,25);
+                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, 25);
                 break;
         }
         getApplication().startActivity(intent);
     }
 
-    private boolean isTopActivity(){ // 최상단 (현재) 작업이 MainActivity인지 확인
+    private boolean isTopActivity() { // 최상단 (현재) 작업이 MainActivity인지 확인
         ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> info;
         info = activityManager.getRunningTasks(1);
-        if(info.get(0).topActivity.getClassName().equals(MainActivity.this.getClass().getName())) {
+        if (info.get(0).topActivity.getClassName().equals(MainActivity.this.getClass().getName())) {
             return true;
         } else {
             return false;
@@ -415,21 +411,27 @@ public class MainActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.device_scan: {
-                Intent serverIntent = new Intent(MainActivity.this, DeviceListActivity.class);
+            case R.id.connect_bluetooth: {
+                Intent serverIntent = new Intent(MainActivity.this, DeviceActivity.class);
                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
                 return true;
             }
-            case R.id.menu1: {
+            case R.id.guide_menu: {
             }
             return false;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void connectActivity() {
+    Intent serverIntent = new Intent(MainActivity.this, DeviceActivity.class);
+    startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+    }
+
+
     private void connectDevice(Intent data) {
         // Intent 통해 전달된 MAC 주소 확인
-        String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+        String address = data.getExtras().getString(DeviceActivity.EXTRA_DEVICE_ADDRESS);
         // MAC 주소 이용해 BluetoothDevice 객체 생성
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // 연결을 위한 메소드 호출
