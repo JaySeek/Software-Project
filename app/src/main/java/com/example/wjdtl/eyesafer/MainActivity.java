@@ -21,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,20 +61,21 @@ public class MainActivity extends Activity {
     private int currentBright = 0; // 현재 밝기 값
     private int alertCount = 0;
 
+    private int distVioCount = 0;
+    private int timeVioCount = 0;
+
     PowerManager pm;
     NotificationManager mNotiManager;
     Notification.Builder distNoti;
 
-    TimerTask distTimerTask;
-    TimerTask tTimerTask;
-    Timer distTimer;
-    Timer tTimer;
+    TimerTask distTimerTask, tTimerTask;
+    Timer distTimer, tTimer;
 
-    TextView nowDistTxt;
-    TextView nowTimeTxt;
+    TextView nowDistTxt, nowDistInfoTxt, nowTimeTxt, distViolationTxt, timeViolationTxt;
 
-    Toast toastAlert;
-    Toast toastTime;
+    Toast toastAlert, toastTime;
+
+    ImageView distImage, timeImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +96,13 @@ public class MainActivity extends Activity {
 
         nowDistTxt = (TextView) findViewById(R.id.nowDistTxt);
         nowTimeTxt = (TextView) findViewById(R.id.nowUseTimeTxt);
+        nowDistInfoTxt = (TextView) findViewById(R.id.nowDistInfoTxt);
+
+        distImage = (ImageView)findViewById(R.id.distImageView);
+        timeImage = (ImageView)findViewById(R.id.timeImageView);
+
+        distViolationTxt = (TextView)findViewById(R.id.distViolationTxt);
+        timeViolationTxt = (TextView)findViewById(R.id.timeViolationTxt);
 
         tTimerTask = new TimerTask() {
             @Override
@@ -108,6 +117,7 @@ public class MainActivity extends Activity {
                     if (tTimeCounter == T_TIME_LIMIT) { // 제한이 필요한 시간이 누적될 경우 알림
                         tHandler.sendEmptyMessage(1);
                         isNeedRest = true;
+
                     }
                     if (tTimeCounter > T_TIME_LIMIT && isNeedRest)
                         tTimeCounter /= 2; // 정해진 시간의 휴식을 취하지 않고 사용할 경우 제한 시간의 절반만 사용해도 알림 출력
@@ -157,7 +167,6 @@ public class MainActivity extends Activity {
             Toast.makeText(this, "블루투스 기능이 없는 장치입니다.", Toast.LENGTH_LONG).show();
             finish();
         }
-
     }
 
     @Override
@@ -242,10 +251,13 @@ public class MainActivity extends Activity {
             switch (msg.what) {
                 case 0:
                     nowTimeTxt.setText("사용 시간 : " + tTimeCounter + "초");
+                    timeViolationTxt.setText("시간 유지 위반 횟수 : " + timeVioCount);
                     break;
                 case 1:
                     toastTime.setText("사용 시간 경과, 휴식 필요");
                     toastTime.show();
+                    timeImage.setImageResource(R.drawable.ic_grade_angry);
+                    timeVioCount++;
                     break;
                 case 2:
                     toastTime.setText("휴식 시간이 부족합니다.");
@@ -254,6 +266,7 @@ public class MainActivity extends Activity {
                     break;
                 case 3:
                     toastTime.setText("충분한 휴식을 취했습니다.");
+                    timeImage.setImageResource(R.drawable.ic_grade_smile);
                     toastTime.show();
                     break;
             }
@@ -300,8 +313,13 @@ public class MainActivity extends Activity {
     };
 
     private void alertDistance(int distance) {
+        distViolationTxt.setText("거리 유지 위반 횟수 : " + distVioCount);
         nowDistTxt.setText("거리 : " + distance + "cm");
+        nowDistInfoTxt.setText("적정 거리입니다.");
+        distImage.setImageResource(R.drawable.ic_grade_smile);
         if (distance < 40) { // 거리가 40cm 미만일 경우
+            nowDistInfoTxt.setText("적절한 거리를 유지하세요.");
+            distImage.setImageResource(R.drawable.ic_grade_angry);
             switch (warnCount) {
                 case 0: // 1차 경고
                     distNoti.setContentTitle("1차 경고");
@@ -322,9 +340,11 @@ public class MainActivity extends Activity {
                     distTimer = new Timer();
                     distTimer.schedule(distTimerTask, 0, 1000);
                     warnCount++;
+                    distVioCount++;
                     break;
                 case 1: // 2차 경고, 밝기 제한
                     if (distTimeCounter == 5) {
+                        distVioCount++;
                         mNotiManager.cancelAll();
                         alertCount = 0;
                         try { // 자동 밝기 기능이 켜져있을 경우 해제 및 현재 밝기값 저장
@@ -412,11 +432,13 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.connect_bluetooth: {
-                Intent serverIntent = new Intent(MainActivity.this, DeviceActivity.class);
-                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+                Intent connectIntent = new Intent(MainActivity.this, DeviceActivity.class);
+                startActivityForResult(connectIntent, REQUEST_CONNECT_DEVICE);
                 return true;
             }
             case R.id.guide_menu: {
+                Intent guideIntent = new Intent(MainActivity.this, GuideActivity.class);
+                startActivity(guideIntent);
             }
             return false;
         }

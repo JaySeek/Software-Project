@@ -9,6 +9,8 @@
     <string name="main_distmonitor">거리 모니터링</string>
     <string name="main_timemonitor">시간 모니터링</string>
 
+    <string name="main_status">거리/시간 현황</string>
+
     <!-- Menu -->
     <string name="menu_device_search">디바이스 검색</string>
     <string name="menu1">가이드</string>

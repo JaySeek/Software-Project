@@ -42,14 +42,12 @@
         <activity
             android:name=".BrightnessActivity"
             android:excludeFromRecents="true"
-            android:theme="@style/EmptyActivity">
-        </activity>
-
+            android:theme="@style/EmptyActivity"></activity>
         <activity
             android:name=".DeviceActivity"
             android:excludeFromRecents="true"
-            android:theme="@style/EmptyActivity">
-        </activity>
+            android:theme="@style/EmptyActivity"></activity>
+        <activity android:name=".GuideActivity"></activity>
     </application>
 
 </manifest>
