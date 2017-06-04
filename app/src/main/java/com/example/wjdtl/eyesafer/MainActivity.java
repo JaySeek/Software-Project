@@ -34,8 +34,6 @@ public class MainActivity extends Activity {
     //디버깅용
     private static final String TAG = "MainActivity";
 
-    private String mConnectedDeviceName = null;
-
     // 인텐트 요청 코드(상수 정의)
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
@@ -301,7 +299,6 @@ public class MainActivity extends Activity {
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // 장치명 저장
-                    mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
                     Toast.makeText(MainActivity.this, "연결 성공", Toast.LENGTH_SHORT).show();
                     break;
                 case Constants.MESSAGE_TOAST:
