@@ -25,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tsengvn.typekit.TypekitContextWrapper;
+
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -455,5 +457,9 @@ public class MainActivity extends Activity {
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // 연결을 위한 메소드 호출
         mBluetoothService.connect(device);
+    }
+
+    @Override protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(TypekitContextWrapper.wrap(newBase));
     }
 }

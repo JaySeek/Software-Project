@@ -9,62 +9,81 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="@color/colorMainMonitor"
+        android:layout_margin="20dp"
+        android:padding="20dp"
+        android:background="@drawable/layout_round"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/subjectMonitorDist"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorDistMonitor"
             android:textColor="@color/colorMonitorText"
+            android:layout_gravity="center"
             android:text="@string/main_distmonitor"
             android:textSize="40dp"/>
 
         <ImageView
             android:id="@+id/distImageView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
             android:src="@drawable/ic_grade_smile" />
 
         <TextView
             android:id="@+id/nowDistTxt"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="1"
+            android:layout_marginTop="20dp"
             android:gravity="center"
+            android:layout_weight="1"
             android:textSize="30dp" />
 
         <TextView
             android:id="@+id/nowDistInfoTxt"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="1"
+            android:layout_marginTop="20dp"
             android:gravity="center"
+            android:layout_weight="1"
             android:textSize="30dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="20dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/layout_round"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/subjectMonitorTime"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorTimeMonitor"
+            android:layout_gravity="center"
             android:textColor="@color/colorMonitorText"
             android:text="@string/main_timemonitor"
             android:textSize="40dp"/>
 
         <ImageView
             android:id="@+id/timeImageView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
             android:src="@drawable/ic_grade_smile" />
 
         <TextView
             android:id="@+id/nowUseTimeTxt"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
@@ -77,31 +96,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="@color/colorMainStatus"
+        android:padding="20dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/layout_round"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/subjectStatus"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorTimeMonitor"
+            android:layout_gravity="center"
+            android:layout_weight="1"
             android:textColor="@color/colorMonitorText"
             android:text="@string/main_status"
             android:textSize="40dp"/>
 
         <TextView
             android:id="@+id/distViolationTxt"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_gravity="center"
             android:layout_weight="1"
             android:textSize="30dp" />
 
         <TextView
             android:id="@+id/timeViolationTxt"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_gravity="center"
             android:layout_weight="1"
             android:textSize="30dp" />
     </LinearLayout>
