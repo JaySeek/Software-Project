@@ -10,4 +10,7 @@
     <color name="colorMonitorText">#00E4E4</color>
     <color name="colorMainStatus">#F4F4F4</color>
 
+    <color name="colorNotiToastBG">#DAAA</color>
+    <color name="colorNotiToastText">#FFF</color>
+
 </resources>

@@ -18,8 +18,10 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -48,7 +50,7 @@ public class MainActivity extends Activity {
     private int tTimeCounter = 0; // 사용 시간 체크 카운터
     private int rTimeCounter = 0; // 휴식 시간 체크 카운터
 
-    private static final int T_TIME_LIMIT = 20; // 사용 시간 제한 기준(초)
+    private static final int T_TIME_LIMIT = 40; // 사용 시간 제한 기준(초)
     private static final int T_TIME_REST = 5; // 휴식 시간 기준(초)
 
     private boolean isSafeDist = true;  // 안전 거리 유지 여부
@@ -72,10 +74,12 @@ public class MainActivity extends Activity {
     Timer distTimer, tTimer;
 
     TextView nowDistTxt, nowDistInfoTxt, nowTimeTxt, distViolationTxt, timeViolationTxt;
+    TextView toastTxt;
 
-    Toast toastAlert, toastTime;
+    //Toast toastAlert, toastTime;
+    Toast toastAlert;
 
-    ImageView distImage, timeImage;
+    ImageView distImage, timeImage, alertImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +107,18 @@ public class MainActivity extends Activity {
 
         distViolationTxt = (TextView)findViewById(R.id.distViolationTxt);
         timeViolationTxt = (TextView)findViewById(R.id.timeViolationTxt);
+
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.custom_toast_layout,(ViewGroup)findViewById(R.id.custom_toast_layout_main));
+
+        toastTxt = (TextView)layout.findViewById(R.id.toastText);
+        alertImage = (ImageView)layout.findViewById(R.id.toastImage);
+        alertImage.setImageResource(R.drawable.ic_noti_alert);
+
+        toastAlert = new Toast(getApplicationContext());
+        toastAlert.setGravity(Gravity.CENTER,0,0);
+        toastAlert.setDuration(Toast.LENGTH_SHORT);
+        toastAlert.setView(layout);
 
         tTimerTask = new TimerTask() {
             @Override
@@ -148,20 +164,6 @@ public class MainActivity extends Activity {
         };
         tTimer = new Timer();
         tTimer.schedule(tTimerTask, 0, 1000);
-
-        toastAlert = Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT);
-        toastAlert.setGravity(Gravity.CENTER, 0, 0);
-
-        ViewGroup group = (ViewGroup) toastAlert.getView();
-        TextView msgTV = (TextView) group.getChildAt(0);
-        msgTV.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 40);
-
-        toastTime = Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT);
-        toastTime.setGravity(Gravity.CENTER, 0, 0);
-
-        group = (ViewGroup) toastTime.getView();
-        msgTV = (TextView) group.getChildAt(0);
-        msgTV.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 40);
 
         if (mBluetoothAdapter == null) { // 기기에 Bluetooth 장치가 없을 경우
             Toast.makeText(this, "블루투스 기능이 없는 장치입니다.", Toast.LENGTH_LONG).show();
@@ -254,20 +256,20 @@ public class MainActivity extends Activity {
                     timeViolationTxt.setText("시간 유지 위반 횟수 : " + timeVioCount);
                     break;
                 case 1:
-                    toastTime.setText("사용 시간 경과, 휴식 필요");
-                    toastTime.show();
+                    toastTxt.setText("사용 시간 경과, 휴식 필요");
+                    toastAlert.show();
                     timeImage.setImageResource(R.drawable.ic_grade_angry);
                     timeVioCount++;
                     break;
                 case 2:
-                    toastTime.setText("휴식 시간이 부족합니다.");
-                    toastTime.show();
+                    toastTxt.setText("휴식 시간이 부족합니다.");
+                    toastAlert.show();
                     isRestMegPr = true;
                     break;
                 case 3:
-                    toastTime.setText("충분한 휴식을 취했습니다.");
+                    toastTxt.setText("충분한 휴식을 취했습니다.");
                     timeImage.setImageResource(R.drawable.ic_grade_smile);
-                    toastTime.show();
+                    toastAlert.show();
                     break;
             }
         }
@@ -316,6 +318,7 @@ public class MainActivity extends Activity {
         nowDistTxt.setText("거리 : " + distance + "cm");
         nowDistInfoTxt.setText("적정 거리입니다.");
         distImage.setImageResource(R.drawable.ic_grade_smile);
+        String alertStr;
         if (distance < 40) { // 거리가 40cm 미만일 경우
             nowDistInfoTxt.setText("적절한 거리를 유지하세요.");
             distImage.setImageResource(R.drawable.ic_grade_angry);
@@ -324,7 +327,8 @@ public class MainActivity extends Activity {
                     distNoti.setContentTitle("1차 경고");
                     distNoti.setContentText("거리 유지 필요");
                     mNotiManager.notify(alertCount++, distNoti.getNotification());
-                    toastAlert.setText("1차 경고");
+                    alertStr = "[1차 경고]\n" + "현재 거리는 " + distance + "cm 입니다.";
+                    toastTxt.setText(alertStr);
                     toastAlert.show();
                     isSafeDist = false;
                     distTimerTask = new TimerTask() {
@@ -357,7 +361,8 @@ public class MainActivity extends Activity {
                         }
                         distNoti.setContentTitle("2차 경고");
                         distNoti.setContentText("밝기 제한");
-                        toastAlert.setText("2차 경고, 밝기 제한");
+                        alertStr = "[2차 경고]\n" + "밝기가 제한되었습니다.";
+                        toastTxt.setText(alertStr);
                         toastAlert.show();
                         mNotiManager.notify(alertCount++, distNoti.getNotification());
                         setBrightness(1);
