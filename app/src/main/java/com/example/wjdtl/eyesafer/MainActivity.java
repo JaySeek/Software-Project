@@ -250,27 +250,33 @@ public class MainActivity extends Activity {
     private final Handler tHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            String toastStr = "";
+            boolean needToast = false;
             switch (msg.what) {
                 case 0:
                     nowTimeTxt.setText("사용 시간 : " + tTimeCounter + "초");
                     timeViolationTxt.setText("시간 유지 위반 횟수 : " + timeVioCount);
                     break;
                 case 1:
-                    toastTxt.setText("사용 시간 경과, 휴식 필요");
-                    toastAlert.show();
+                    needToast = true;
+                    toastStr = "[사용 시간 경과]\n 휴식 필요";
                     timeImage.setImageResource(R.drawable.ic_grade_angry);
                     timeVioCount++;
                     break;
                 case 2:
-                    toastTxt.setText("휴식 시간이 부족합니다.");
-                    toastAlert.show();
+                    needToast = true;
+                    toastStr = "[휴식 부족]\n 휴식시간이 부족합니다.";
                     isRestMegPr = true;
                     break;
                 case 3:
-                    toastTxt.setText("충분한 휴식을 취했습니다.");
+                    needToast = true;
+                    toastStr = "[휴식 완료]\n 충분한 휴식을 취했습니다.";
                     timeImage.setImageResource(R.drawable.ic_grade_smile);
-                    toastAlert.show();
                     break;
+            }
+            if(needToast == true) {
+                toastTxt.setText(toastStr);
+                toastAlert.show();
             }
         }
     };
