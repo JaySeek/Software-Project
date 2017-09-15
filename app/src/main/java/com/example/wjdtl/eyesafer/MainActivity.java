@@ -76,7 +76,6 @@ public class MainActivity extends Activity {
     TextView nowDistTxt, nowDistInfoTxt, nowTimeTxt, distViolationTxt, timeViolationTxt;
     TextView toastTxt;
 
-    //Toast toastAlert, toastTime;
     Toast toastAlert;
 
     ImageView distImage, timeImage, alertImage;
