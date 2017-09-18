@@ -12,7 +12,7 @@ public class DeviceActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String address = "34:FC:EF:10:DD:80";
+        String address = "98:D3:36:80:F2:5F";
 
         // Intent 객체에 MAC 주소 추가
         Intent intent = new Intent();
