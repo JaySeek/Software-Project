@@ -15,7 +15,6 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -66,6 +65,8 @@ public class MainActivity extends Activity {
     private int distVioCount = 0;
     private int timeVioCount = 0;
 
+    private boolean isOnBlueLight = false;
+
     String alertTitle, alertCont;
 
     PowerManager pm;
@@ -89,11 +90,11 @@ public class MainActivity extends Activity {
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
 
         // Notification
 
-        mNotiManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mNotiManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
         distNoti = new Notification.Builder(this);
         distNoti.setSmallIcon(R.drawable.ic_noti_alert);
@@ -103,25 +104,25 @@ public class MainActivity extends Activity {
 
         // Main Activity 뷰
 
-        nowDistTxt = (TextView) findViewById(R.id.nowDistTxt);
-        nowTimeTxt = (TextView) findViewById(R.id.nowUseTimeTxt);
-        nowDistInfoTxt = (TextView) findViewById(R.id.nowDistInfoTxt);
+        nowDistTxt = findViewById(R.id.nowDistTxt);
+        nowTimeTxt = findViewById(R.id.nowUseTimeTxt);
+        nowDistInfoTxt = findViewById(R.id.nowDistInfoTxt);
 
-        distImage = (ImageView)findViewById(R.id.distImageView);
-        timeImage = (ImageView)findViewById(R.id.timeImageView);
+        distImage = findViewById(R.id.distImageView);
+        timeImage = findViewById(R.id.timeImageView);
 
-        distViolationTxt = (TextView)findViewById(R.id.distViolationTxt);
-        timeViolationTxt = (TextView)findViewById(R.id.timeViolationTxt);
+        distViolationTxt = findViewById(R.id.distViolationTxt);
+        timeViolationTxt = findViewById(R.id.timeViolationTxt);
 
         // Custon Toast
 
         LayoutInflater inflater = getLayoutInflater();
         View layout = inflater.inflate(R.layout.custom_toast_layout,(ViewGroup)findViewById(R.id.custom_toast_layout_main));
 
-        toastTitle = (TextView)layout.findViewById(R.id.toastTitle);
-        toastCont = (TextView)layout.findViewById(R.id.toastContents);
+        toastTitle = layout.findViewById(R.id.toastTitle);
+        toastCont = layout.findViewById(R.id.toastContents);
 
-        alertImage = (ImageView)layout.findViewById(R.id.toastImage);
+        alertImage = layout.findViewById(R.id.toastImage);
         alertImage.setImageResource(R.drawable.ic_noti_alert);
 
         toastAlert = new Toast(getApplicationContext());
@@ -261,7 +262,6 @@ public class MainActivity extends Activity {
     private final Handler tHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            //String strTitle = "", strCont = "";
             boolean needToast = false;
             switch (msg.what) {
                 case 0:
@@ -480,18 +480,24 @@ public class MainActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.connect_bluetooth: {
-                Intent connectIntent = new Intent(MainActivity.this, DeviceActivity.class);
+            case R.id.connect_bluetooth:
+                Intent connectIntent = new Intent(this, DeviceActivity.class);
                 startActivityForResult(connectIntent, REQUEST_CONNECT_DEVICE);
                 return true;
-            }
-            case R.id.guide_menu: {
-                Intent guideIntent = new Intent(MainActivity.this, GuideActivity.class);
-                startActivity(guideIntent);
-            }
-            return false;
+            case R.id.bluelight:
+                Intent bluelightIntent = new Intent(this, BlueLightService.class);
+                if(!isOnBlueLight) {
+                    startService(bluelightIntent);
+                    isOnBlueLight = true;
+                }
+                else {
+                    stopService(bluelightIntent);
+                    isOnBlueLight = false;
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     private void connectActivity() {

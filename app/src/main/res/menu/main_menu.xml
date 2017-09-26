@@ -4,12 +4,13 @@
         android:id="@+id/connect_bluetooth"
         android:icon="@drawable/ic_action_device_bluetooth_connect"
         android:title="@string/menu_device_search"
-        android:showAsAction="ifRoom"/>
+        android:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/guide_menu"
-        android:title="@string/menu1"
-        android:showAsAction="never"/>
+        android:id="@+id/bluelight"
+        android:icon="@drawable/ic_action_bluelight"
+        android:title="@string/menu_bluelight"
+        android:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/menu2"

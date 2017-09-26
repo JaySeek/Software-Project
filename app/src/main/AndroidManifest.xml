@@ -15,6 +15,9 @@
     <!-- 현재 Task 반환 권한 등록 -->
     <uses-permission android:name="android.permission.GET_TASKS" />
 
+    <!-- 특정 View를 다른 앱이나 뷰 위에 보여주기 위한 권한 등록(블루라이트 기능)  -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -40,15 +43,17 @@
             </intent-filter>
         </receiver>
 
+        <service android:name=".BlueLightService"/>
+
         <activity
             android:name=".BrightnessActivity"
             android:excludeFromRecents="true"
             android:theme="@style/EmptyActivity"></activity>
+
         <activity
             android:name=".DeviceActivity"
             android:excludeFromRecents="true"
             android:theme="@style/EmptyActivity"></activity>
-        <activity android:name=".GuideActivity"></activity>
     </application>
 
 </manifest>
