@@ -19,13 +19,13 @@ public class BlueLightService extends Service {
     {
         mView = new MyView(this);
 
-        mParams = new WindowManager.LayoutParams(
+        mParams = new WindowManager.LayoutParams( // 최상위에 떠있는 뷰를 만드는 부분
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                        | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY, // 최상위에 있도록 해주는 타입
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE // 윈도우가 포커스 받지 못함
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL // 뷰가 밀려서 밖으로 나가지 않게 함
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN, // 윈도우 영역에 상태바 포함
                 PixelFormat.TRANSLUCENT);
 
         mWindowManager = (WindowManager)getSystemService(WINDOW_SERVICE);
