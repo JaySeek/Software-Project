@@ -265,8 +265,8 @@ public class MainActivity extends Activity {
             boolean needToast = false;
             switch (msg.what) {
                 case 0:
-                    nowTimeTxt.setText("사용 시간 : " + tTimeCounter + "초");
-                    timeViolationTxt.setText("시간 유지 위반 횟수 : " + timeVioCount);
+                    nowTimeTxt.setText("마지막 휴식 후 " + tTimeCounter + "초 경과");
+                    timeViolationTxt.setText("사용 시간 위반 " + timeVioCount + "회");
                     break;
                 case 1:
                     needToast = true;
@@ -334,7 +334,7 @@ public class MainActivity extends Activity {
     };
 
     private void alertDistance(int distance) {
-        distViolationTxt.setText("거리 유지 위반 횟수 : " + distVioCount);
+        distViolationTxt.setText("거리 미 유지 " + distVioCount + "회");
         nowDistTxt.setText("거리 : " + distance + "cm");
         nowDistInfoTxt.setText("적정 거리입니다.");
         distImage.setImageResource(R.drawable.ic_grade_smile);

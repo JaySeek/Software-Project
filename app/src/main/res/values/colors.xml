@@ -7,7 +7,7 @@
     <color name="colorMainMonitor">#C0C0C0</color>
     <color name="colorDistMonitor">#6B6B6B</color>
     <color name="colorTimeMonitor">#6B6B6B</color>
-    <color name="colorMonitorText">#00E4E4</color>
+    <color name="colorMonitorText">#000000</color>
     <color name="colorMainStatus">#F4F4F4</color>
 
     <color name="colorNotiToastBG">#DAAA</color>

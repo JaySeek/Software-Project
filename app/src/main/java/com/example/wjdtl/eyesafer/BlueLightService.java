@@ -59,7 +59,7 @@ public class BlueLightService extends Service {
         protected void onDraw(Canvas canvas)
         {
             super.onDraw(canvas);
-            canvas.drawARGB(100, 255, 212, 0); // Alpha, Red, Green, Blue
+            canvas.drawARGB(50, 255, 212, 0); // Alpha, Red, Green, Blue
         }
 
         @Override

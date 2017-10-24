@@ -6,10 +6,10 @@
     <string name="not_connected">연결된 장치가 없음</string>
     <string name="connected_device_name">연결됨</string>
 
-    <string name="main_distmonitor"><u>거리 모니터링</u></string>
-    <string name="main_timemonitor"><u>시간 모니터링</u></string>
+    <string name="main_distmonitor"><u>거리 정보</u></string>
+    <string name="main_timemonitor"><u>사용 시간 정보</u></string>
 
-    <string name="main_status"><u>거리/시간 현황</u></string>
+    <string name="main_status"><u>경고 위반</u></string>
 
     <!-- Menu -->
     <string name="menu_device_search">디바이스 검색</string>
