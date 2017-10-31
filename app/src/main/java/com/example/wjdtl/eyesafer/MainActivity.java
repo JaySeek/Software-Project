@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.support.annotation.IntDef;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -28,6 +29,8 @@ import android.widget.Toast;
 
 import com.tsengvn.typekit.TypekitContextWrapper;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -73,8 +76,8 @@ public class MainActivity extends Activity {
     NotificationManager mNotiManager;
     Notification.Builder distNoti;
 
-    TimerTask distTimerTask, tTimerTask;
-    Timer distTimer, tTimer;
+    TimerTask distTimerTask, tTimerTask, bTimerTask;
+    Timer distTimer, tTimer, bTimer;
 
     TextView nowDistTxt, nowDistInfoTxt, nowTimeTxt, distViolationTxt, timeViolationTxt;
     TextView toastTitle, toastCont;
@@ -114,7 +117,7 @@ public class MainActivity extends Activity {
         distViolationTxt = findViewById(R.id.distViolationTxt);
         timeViolationTxt = findViewById(R.id.timeViolationTxt);
 
-        // Custon Toast
+        // Custom Toast
 
         LayoutInflater inflater = getLayoutInflater();
         View layout = inflater.inflate(R.layout.custom_toast_layout,(ViewGroup)findViewById(R.id.custom_toast_layout_main));
@@ -176,6 +179,29 @@ public class MainActivity extends Activity {
         };
         tTimer = new Timer();
         tTimer.schedule(tTimerTask, 0, 1000);
+
+        bTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                Calendar cal = Calendar.getInstance();
+                int hour = cal.get(Calendar.HOUR_OF_DAY);
+                Intent bluelightIntent = new Intent(MainActivity.this, BlueLightService.class);
+
+                if(hour >= 22 || hour <= 7) {
+                    if(isOnBlueLight == true) {
+                        startService(bluelightIntent);
+                    }
+                    else
+                        stopService(bluelightIntent);
+                }
+
+                else {
+                    stopService(bluelightIntent);
+                }
+            }
+        };
+        bTimer = new Timer();
+        bTimer.schedule(bTimerTask, 0, 1000);
 
         if (mBluetoothAdapter == null) { // 기기에 Bluetooth 장치가 없을 경우
             Toast.makeText(this, "블루투스 기능이 없는 장치입니다.", Toast.LENGTH_LONG).show();
@@ -485,15 +511,7 @@ public class MainActivity extends Activity {
                 startActivityForResult(connectIntent, REQUEST_CONNECT_DEVICE);
                 return true;
             case R.id.bluelight:
-                Intent bluelightIntent = new Intent(this, BlueLightService.class);
-                if(!isOnBlueLight) {
-                    startService(bluelightIntent);
-                    isOnBlueLight = true;
-                }
-                else {
-                    stopService(bluelightIntent);
-                    isOnBlueLight = false;
-                }
+                isOnBlueLight = !isOnBlueLight;
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
