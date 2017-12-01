@@ -13,21 +13,29 @@ void setup() {
 }
 
 void loop() {
-    delay(300);
-    BTSerial.print(calDistance());
-    BTSerial.print("d");
+  int i = 0;
+  int data = 0;
+  
+  for(i=0;i<10;i++) {
+      data += calDistance();
+      delay(100);
+  }
+  
+  data /= 10;
+  
+  BTSerial.print(data);
+  BTSerial.print("d");
 }
 
 long calDistance() {
-    long duration, distance;
-    digitalWrite(trigPin, LOW);
-    delayMicroseconds(2);
-    digitalWrite(trigPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trigPin, LOW);
-    duration = pulseIn(echoPin, HIGH);
-    distance = duration * 17 / 1000;
-    return distance;
-    delay(500);
+  long duration, distance;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 17 / 1000;
+  return distance;
+  delay(100);
 }
-
