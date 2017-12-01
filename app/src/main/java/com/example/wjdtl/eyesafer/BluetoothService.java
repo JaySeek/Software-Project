@@ -14,9 +14,6 @@ import java.io.InputStream;
 import java.util.UUID;
 
 public class BluetoothService {
-    // 디버그용
-    private static final String TAG = "BluetoothService";
-
     //UUID
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
@@ -45,7 +42,6 @@ public class BluetoothService {
 
     private synchronized void updateUserInterfaceTitle() {
         mState = getState();
-        Log.d(TAG, "updateUserInterfaceTitle() " + mNewState + " -> " + mState);
         mNewState = mState;
 
         // MainActivity의 제목에 새로운 사항을 반영하기 위해 메시지 보냄
@@ -176,7 +172,6 @@ public class BluetoothService {
             try {
                 tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
             } catch (IOException e) {
-                Log.e(TAG, "create() failed");
             }
             mSocket = tmp;
             mState = STATE_CONNECTING;

@@ -4,14 +4,14 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
+    android:padding="10sp"
     android:background="@color/colorNotiToastBG">
 
     <ImageView
         android:id="@+id/toastImage"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginRight="10dp" />
+        android:layout_marginRight="10sp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:textColor="@color/colorNotiToastText"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/toastContents"
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:textColor="@color/colorNotiToastText"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
     </LinearLayout>
 
 </LinearLayout>

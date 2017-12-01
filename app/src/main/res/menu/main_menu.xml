@@ -11,9 +11,4 @@
         android:icon="@drawable/ic_action_bluelight"
         android:title="@string/menu_bluelight"
         android:showAsAction="ifRoom"/>
-
-    <item
-        android:id="@+id/menu2"
-        android:title="@string/menu2"
-        android:showAsAction="never"/>
     </menu>

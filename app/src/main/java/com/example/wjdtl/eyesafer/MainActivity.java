@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.support.annotation.IntDef;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -27,19 +26,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tsengvn.typekit.TypekitContextWrapper;
-
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends Activity {
-
-    //디버깅용
-    private static final String TAG = "MainActivity";
-
     // 인텐트 요청 코드(상수 정의)
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
@@ -52,8 +44,8 @@ public class MainActivity extends Activity {
     private int tTimeCounter = 0; // 사용 시간 체크 카운터
     private int rTimeCounter = 0; // 휴식 시간 체크 카운터
 
-    private static final int T_TIME_LIMIT = 40; // 사용 시간 제한 기준(초)
-    private static final int T_TIME_REST = 5; // 휴식 시간 기준(초)
+    private static final int T_TIME_LIMIT = 3000; // 사용 시간 제한 기준(초)
+    private static final int T_TIME_REST = 600; // 휴식 시간 기준(초)
 
     private boolean isSafeDist = true;  // 안전 거리 유지 여부
     private boolean isNeedRest = false; // 휴식 필요 여부
@@ -261,12 +253,10 @@ public class MainActivity extends Activity {
             case REQUEST_ENABLE_BT: // 블루투스를 Enable 시키기 위한 요청 코드일 경우
                 if (resultCode == Activity.RESULT_OK) {
                     // 켠다면
-                    Log.d(TAG, "BT not enabled");
                     Toast.makeText(this, "블루투스 ON 상태, \n장치를 연결합니다.", Toast.LENGTH_SHORT).show();
                     mBluetoothService = new BluetoothService(this, mHandler);
                     connectActivity();
                 } else { // 켜지 않는다면
-                    Log.d(TAG, "BT not enabled");
                     Toast.makeText(this, "블루투스 OFF 상태, \n앱을 종료합니다.", Toast.LENGTH_SHORT).show();
                     finish();
                 }
@@ -531,9 +521,5 @@ public class MainActivity extends Activity {
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // 연결을 위한 메소드 호출
         mBluetoothService.connect(device);
-    }
-
-    @Override protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(TypekitContextWrapper.wrap(newBase));
     }
 }
